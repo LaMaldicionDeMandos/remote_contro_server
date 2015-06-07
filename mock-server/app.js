@@ -5,9 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-//var routes = require('./routes/index');
-//var users = require('./routes/users');
-
 var app = express();
 
 // view engine setup
@@ -26,6 +23,19 @@ var leds = [false, false, false];
 
 const ON = 'on';
 const OFF = 'off';
+
+app.get('/ping', function(req, res, next) {
+    res.sendStatus(200);
+});
+
+app.get('/status/:id', function(req, res, next) {
+    var result = leds[req.params.id] ? "on" : "off";
+    res.send(result);
+});
+
+app.get('/leds', function(req, res, next) {
+    res.send("[0,1,2]");
+});
 
 app.put('/led/:id/:command', function(req, res, next) {
     var id = req.params.id;
