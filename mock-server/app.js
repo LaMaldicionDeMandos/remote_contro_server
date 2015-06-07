@@ -5,8 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+//var routes = require('./routes/index');
+//var users = require('./routes/users');
 
 var app = express();
 
@@ -22,8 +22,35 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
+var leds = [false, false, false];
+
+const ON = 'on';
+const OFF = 'off';
+
+app.put('/led/:id/:command', function(req, res, next) {
+    var id = req.params.id;
+    var command = req.params.command;
+    console.log("LED " + id + " " + command);
+    if (id < 0 || id > 2) {
+        console.log("LED " + id + " no exist");
+        res.sendStatus(404);
+        return;
+    } 
+    if (command != ON && command != OFF) {
+        console.log("INVALID COMMAND " + command);
+        res.sendStatus(400);
+        return;
+    }
+    var flag = command == ON;
+    if (leds[id] == flag) {
+        console.log("LED " + id + " already is " + command);
+        res.sendStatus(304);
+        return;
+    }
+    leds[id] = flag;
+    res.sendStatus(200);
+    //res.send("OK");
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
